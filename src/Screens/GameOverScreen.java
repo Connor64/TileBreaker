@@ -1,0 +1,137 @@
+package Screens;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
+
+import GameState.GameState;
+import GameState.GameStateManager;
+
+public class GameOverScreen extends GameState implements ActionListener {
+	private JLabel losingText, scoreText, highScoreText;
+	private JButton retryButton, quitButton;
+	
+	String[] lowMessages = {
+			"You suck.",
+			"You lost! Loser!",
+			"Please give up.",
+			"I've seen, like, WAY better.",
+			};
+	
+	String[] midMessages = {
+			"Not the worst.",
+			"That wasn't awful.",
+			"You did okay... ish.",
+			"There's a little potential.",
+			};
+	
+	String[] highMessages = {
+			"Wow, you're not too bad.",
+			"I'm impressed.",
+			"You have my attention...",
+			};
+	
+	String[] superMessages = {
+			"That was amazing...",
+			"How did you do that??",
+			"You're amazing at this.",
+			"Are you cheating??",
+			"Keep it up!"
+			};
+	
+	public GameOverScreen(int scoreVal) {
+		setLayout(null);
+		manager.highScore = scoreVal > manager.highScore ? scoreVal : manager.highScore;
+		
+		String[] currentMessages;
+		
+		if (scoreVal < 300) {
+			currentMessages = lowMessages;
+		} else if (scoreVal >= 300 && scoreVal < 600) {
+			currentMessages = midMessages;
+		} else if (scoreVal >= 600 && scoreVal < 1500) {
+			currentMessages = highMessages;
+		} else {
+			currentMessages = superMessages;
+		}
+		
+		retryButton = new JButton("Try Again");
+		retryButton.setActionCommand("RETRY");
+		retryButton.setBounds(manager.WIDTH / 2 - 100, manager.HEIGHT / 2 + 50, 200, 50);
+		retryButton.setBackground(Color.white);
+		retryButton.setFont(manager.buttonFont);
+		retryButton.setVisible(true);
+
+		quitButton = new JButton("Quit to Menu");
+		quitButton.setActionCommand("QUIT");
+		quitButton.setBounds(manager.WIDTH / 2 - 100, manager.HEIGHT / 2 + 110, 200, 50);
+		quitButton.setBackground(Color.white);
+		quitButton.setFont(manager.buttonFont);
+		quitButton.setVisible(true);
+
+		try {
+			losingText = new JLabel(currentMessages[new Random().nextInt(currentMessages.length)], SwingConstants.CENTER);
+		} catch (Exception e) {
+			losingText = new JLabel("The message didn't load correctly and it's all your fault.");
+		}
+		losingText.setBounds(manager.WIDTH / 2 - 400, 100, 800, 100);
+		losingText.setFont(manager.messageFont);
+		
+		scoreText = new JLabel("Total Score: " + scoreVal, SwingConstants.CENTER);
+		scoreText.setBounds(manager.WIDTH / 2 - 400, 200, 800, 100);
+		scoreText.setFont(manager.scoreFont);
+		
+		highScoreText = new JLabel("High Score: " + manager.highScore, SwingConstants.CENTER);
+		highScoreText.setBounds(manager.WIDTH / 2 - 400, 250, 800, 100);
+		highScoreText.setFont(manager.scoreFont);
+		
+		add(retryButton);
+		add(quitButton);
+		add(losingText);
+		add(scoreText);
+		add(highScoreText);
+		
+		retryButton.addActionListener(this);
+		quitButton.addActionListener(this);
+	}
+	
+	@Override
+	public void loadContent() {}
+
+	@Override
+	public void unloadContent() {}
+
+	@Override
+	public void update(float deltaTime) {}
+
+	@Override
+	public void draw(Graphics g) {}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		switch(e.getActionCommand()) {
+		case "RETRY":
+			System.out.println("Play Again");
+			manager.changeScreens(new GameplayScreen());
+			break;
+		case "QUIT":
+			System.out.println("Quit");
+			manager.changeScreens(new TitleScreen());
+//			manager.running = false;
+			break;
+		default:
+			System.err.println("Unable to parse action command: " + e.getActionCommand());
+			break;
+		}
+	}
+}
