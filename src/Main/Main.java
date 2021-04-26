@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import GameState.*;
+import Screens.HelpScreen;
 import Screens.GameOverScreen;
 import Screens.GameplayScreen;
 import Screens.TitleScreen;
@@ -17,7 +18,7 @@ public class Main {
     
     private static long time;
     
-    private static final int TARGET_FRAME_RATE = 60;
+    private static final int TARGET_FRAME_RATE = 120;
     
     public static void initialize() {
     	time = System.nanoTime();

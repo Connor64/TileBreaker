@@ -16,12 +16,12 @@ import java.awt.geom.*;
  */
 public class Player extends GameObject implements KeyListener {
 	private float speed = 200;
-	private boolean canShoot = true;
 	
 	public final float SHOOT_DELAY = 0.17f;	// How many seconds it takes to shoot a regular cyan laser pulse
 	public final float BLAST_DELAY = 15;	// How many seconds it takes to shoot a blast from the start/after one is shot
 	private final int BLAST_COST = 50;		// How much each magenta blast costs in terms of player score
 	
+	private boolean canShoot = true;		// Is set to true if the shoot/blast keys are released
 	private float lastShoot = 0;			// The time since the last regular cyan laser pulse was launched
 	public float lastBlast = 0;				// The time since the last magenta blast was shot
 	
@@ -57,21 +57,30 @@ public class Player extends GameObject implements KeyListener {
     		position.y = defaultPosition.y;
     	}
     	
-    	if (manager.pressedKeys.contains(KeyEvent.VK_A) && position.x - (origin.x * width) > 0) {
+    	if ((manager.pressedKeys.contains(KeyEvent.VK_A) || manager.pressedKeys.contains(KeyEvent.VK_LEFT)) 
+    			&& position.x - (origin.x * width) > 0) {
     		position.x -= speed * deltaTime;
     	}
     	
-    	if (manager.pressedKeys.contains(KeyEvent.VK_D) && position.x + (origin.x * width) < manager.WIDTH) {
+    	if ((manager.pressedKeys.contains(KeyEvent.VK_D) || manager.pressedKeys.contains(KeyEvent.VK_RIGHT)) 
+    			&& position.x + (origin.x * width) < manager.WIDTH) {
     		position.x += speed * deltaTime;
     	}
     	
     	if (manager.pressedKeys.contains(KeyEvent.VK_SPACE) && canShoot && lastShoot > SHOOT_DELAY) {
-    		bullets.add(new Bullet(new Vector2(position.x, position.y - (origin.y * height)), (float)Math.PI / 2, new Vector2(0.5f, 0.5f), Color.CYAN, 5));
+    		bullets.add(new Bullet(new Vector2(position.x, position.y - (origin.y * height)), (float)Math.PI / 2,
+    				new Vector2(0.5f, 0.5f), Color.CYAN, 5));
+    		
     		canShoot = false;
     		lastShoot = 0;
     		position.y = defaultPosition.y + 5;
-    	} else if (manager.pressedKeys.contains(KeyEvent.VK_SHIFT) && canShoot && lastShoot > SHOOT_DELAY && lastBlast > BLAST_DELAY && score >= BLAST_COST) {
-    		bullets.add(new Bullet(new Vector2(position.x, position.y - (origin.y * height)), (float)Math.PI / 2, new Vector2(0.5f, 0.5f), Color.MAGENTA, 10));
+//    		score += 300; // used for debugging
+    	} else if (manager.pressedKeys.contains(KeyEvent.VK_SHIFT) && canShoot && lastShoot > SHOOT_DELAY && lastBlast > BLAST_DELAY 
+    			&& score >= BLAST_COST) {
+    		
+    		bullets.add(new Bullet(new Vector2(position.x, position.y - (origin.y * height)), (float)Math.PI / 2, 
+    				new Vector2(0.5f, 0.5f),Color.MAGENTA, 10));
+    		
     		score -= BLAST_COST;
     		canShoot = false;
     		lastShoot = 0;
@@ -86,9 +95,11 @@ public class Player extends GameObject implements KeyListener {
         
         Path2D path = new Path2D.Float();
         
-        path.moveTo(position.x - (origin.x * width), position.y + (origin.y * height));
-        path.lineTo(position.x, position.y - (origin.y * height));
-        path.lineTo(position.x + (origin.x * width), position.y + (origin.y * height));
+        path.moveTo(position.x - (origin.x * width), position.y + (origin.y * height)); // Bottom left
+        path.lineTo(position.x, position.y - (origin.y * height));						// Top
+        path.lineTo(position.x + (origin.x * width), position.y + (origin.y * height)); // Bottom Right
+        path.lineTo(position.x + 2, position.y + (origin.y * height) - 10);
+        path.lineTo(position.x - 2, position.y + (origin.y * height) - 10);
         
         path.closePath();
         g2D.setColor(color);

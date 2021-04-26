@@ -13,6 +13,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author jamescolbert
@@ -28,9 +29,6 @@ public class GameStateManager implements KeyListener {
 	
 	public int highScore = 0;
 
-	public Font titleFont, messageFont, buttonFont, scoreFont, detailFont;
-	public Color defaultColor = new Color(51, 51, 51);
-	
 	public SimpleAttributeSet centerStyle;
 
 	public Stack<Integer> pressedKeys = new Stack<Integer>();
@@ -60,24 +58,15 @@ public class GameStateManager implements KeyListener {
 		frame.addKeyListener(this);
 		frame.repaint();
 		
-		
-		try {
-			// Font used: "Minecraftia" by Andrew Tyler - https://textcraft.net/download-fonts.php
-			titleFont = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/8Bit.ttf")).deriveFont(Font.BOLD, 75);
-			messageFont = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/8Bit.ttf")).deriveFont(Font.BOLD, 30);
-			buttonFont = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/8Bit.ttf")).deriveFont(Font.BOLD, 18);
-			scoreFont = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/8Bit.ttf")).deriveFont(Font.BOLD, 24);
-			detailFont = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/8Bit.ttf")).deriveFont(Font.BOLD, 18);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
 		centerStyle = new SimpleAttributeSet();
 		StyleConstants.setAlignment(centerStyle, StyleConstants.ALIGN_CENTER);
 	}
 
 	public void addScreen(GameState screen) {
 		try {
+			if (screens.size() > 0) {
+				frame.remove(screens.peek());
+			}
 			frame.add(screen);
 			frame.pack();
 			screens.push(screen);
@@ -96,7 +85,15 @@ public class GameStateManager implements KeyListener {
 		if (screens.size() > 0) {
 			try {
 				screens.peek().unloadContent();
+				frame.remove(screens.peek());
 				screens.pop();
+				if (screens.size() > 0) {
+					frame.add(screens.peek());
+					frame.pack();
+					frame.revalidate();
+					frame.repaint();
+					frame.requestFocusInWindow();
+				}
 			} catch (Exception e) {
 				System.out.println("Error upon removing top screen from stack: ");
 				e.printStackTrace();

@@ -7,12 +7,14 @@ import java.util.Stack;
 
 import javax.swing.JPanel;
 
+import Engine.AssetManager;
 import Objects.GameObject;
 /**
  * @author jamescolbert
  */
 public abstract class GameState extends JPanel {
-	public GameStateManager manager = GameStateManager.Instance();
+	public GameStateManager gameStateManager = GameStateManager.Instance();
+	public AssetManager assetManager = AssetManager.Instance();
     
     public abstract void loadContent();
     public abstract void unloadContent();
@@ -30,6 +32,6 @@ public abstract class GameState extends JPanel {
     
     @Override
 	public Dimension getPreferredSize() {
-		return new Dimension(manager.WIDTH, manager.HEIGHT);
+		return new Dimension(gameStateManager.WIDTH, gameStateManager.HEIGHT);
 	}
 }

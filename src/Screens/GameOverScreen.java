@@ -16,6 +16,7 @@ import javax.swing.SwingConstants;
 
 import GameState.GameState;
 import GameState.GameStateManager;
+import Objects.TileManager;
 
 public class GameOverScreen extends GameState implements ActionListener {
 	private JLabel losingText, scoreText, highScoreText;
@@ -49,17 +50,17 @@ public class GameOverScreen extends GameState implements ActionListener {
 			"Keep it up!"
 			};
 	
-	public GameOverScreen(int scoreVal) {
+	public GameOverScreen(int scoreVal, int level) {
 		setLayout(null);
-		manager.highScore = scoreVal > manager.highScore ? scoreVal : manager.highScore;
+		gameStateManager.highScore = scoreVal > gameStateManager.highScore ? scoreVal : gameStateManager.highScore;
 		
 		String[] currentMessages;
 		
-		if (scoreVal < 300) {
+		if (level >= 0 && level <= 2) {
 			currentMessages = lowMessages;
-		} else if (scoreVal >= 300 && scoreVal < 600) {
+		} else if (level >= 3 && level <= 5) {
 			currentMessages = midMessages;
-		} else if (scoreVal >= 600 && scoreVal < 1500) {
+		} else if (level >= 6 && level <= 8) {
 			currentMessages = highMessages;
 		} else {
 			currentMessages = superMessages;
@@ -67,16 +68,16 @@ public class GameOverScreen extends GameState implements ActionListener {
 		
 		retryButton = new JButton("Try Again");
 		retryButton.setActionCommand("RETRY");
-		retryButton.setBounds(manager.WIDTH / 2 - 100, manager.HEIGHT / 2 + 50, 200, 50);
+		retryButton.setBounds(gameStateManager.WIDTH / 2 - 100, gameStateManager.HEIGHT / 2 + 50, 200, 50);
 		retryButton.setBackground(Color.white);
-		retryButton.setFont(manager.buttonFont);
+		retryButton.setFont(assetManager.buttonFont);
 		retryButton.setVisible(true);
 
 		quitButton = new JButton("Quit to Menu");
 		quitButton.setActionCommand("QUIT");
-		quitButton.setBounds(manager.WIDTH / 2 - 100, manager.HEIGHT / 2 + 110, 200, 50);
+		quitButton.setBounds(gameStateManager.WIDTH / 2 - 100, gameStateManager.HEIGHT / 2 + 110, 200, 50);
 		quitButton.setBackground(Color.white);
-		quitButton.setFont(manager.buttonFont);
+		quitButton.setFont(assetManager.buttonFont);
 		quitButton.setVisible(true);
 
 		try {
@@ -84,16 +85,16 @@ public class GameOverScreen extends GameState implements ActionListener {
 		} catch (Exception e) {
 			losingText = new JLabel("The message didn't load correctly and it's all your fault.");
 		}
-		losingText.setBounds(manager.WIDTH / 2 - 400, 100, 800, 100);
-		losingText.setFont(manager.messageFont);
+		losingText.setBounds(gameStateManager.WIDTH / 2 - 400, 100, 800, 100);
+		losingText.setFont(assetManager.messageFont);
 		
 		scoreText = new JLabel("Total Score: " + scoreVal, SwingConstants.CENTER);
-		scoreText.setBounds(manager.WIDTH / 2 - 400, 200, 800, 100);
-		scoreText.setFont(manager.scoreFont);
+		scoreText.setBounds(gameStateManager.WIDTH / 2 - 400, 200, 800, 100);
+		scoreText.setFont(assetManager.scoreFont);
 		
-		highScoreText = new JLabel("High Score: " + manager.highScore, SwingConstants.CENTER);
-		highScoreText.setBounds(manager.WIDTH / 2 - 400, 250, 800, 100);
-		highScoreText.setFont(manager.scoreFont);
+		highScoreText = new JLabel("High Score: " + gameStateManager.highScore, SwingConstants.CENTER);
+		highScoreText.setBounds(gameStateManager.WIDTH / 2 - 400, 250, 800, 100);
+		highScoreText.setFont(assetManager.scoreFont);
 		
 		add(retryButton);
 		add(quitButton);
@@ -122,11 +123,12 @@ public class GameOverScreen extends GameState implements ActionListener {
 		switch(e.getActionCommand()) {
 		case "RETRY":
 			System.out.println("Play Again");
-			manager.changeScreens(new GameplayScreen());
+			TileManager.Instance().reset();
+			gameStateManager.changeScreens(new GameplayScreen());
 			break;
 		case "QUIT":
 			System.out.println("Quit");
-			manager.changeScreens(new TitleScreen());
+			gameStateManager.changeScreens(new TitleScreen());
 //			manager.running = false;
 			break;
 		default:

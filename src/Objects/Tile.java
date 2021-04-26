@@ -10,24 +10,30 @@ import Engine.Vector2;
 public class Tile extends GameObject {
 	public TileType type;
 	public static final int SAMPLE_SIZE = 20;
-	private int health = 4;
+	public int health, value;
 	private TileManager tileManager = TileManager.Instance();
-	
+
 	public Tile(Vector2 position, int width, int height) {
 		this.position = position;
 		this.width = width;
 		this.height = height;
 		type = tileManager.randomType();
-		
-		switch(type) {
+
+		switch (type) {
 		case NORMAL:
 			color = Color.blue;
+			value = 1;
+			health = 1;
 			break;
 		case BOMB:
 			color = Color.red;
+			value = 0;
+			health = 1;
 			break;
 		case INDESTRUCTIBLE:
 			color = Color.gray;
+			value = 10;
+			health = 4;
 			break;
 		}
 	}
@@ -54,36 +60,32 @@ public class Tile extends GameObject {
 	public void update(float deltaTime) {
 	}
 
-	public int destroy(Tile[][] tiles, boolean normalBlast) {
+	public boolean damage() {
+		health--;
+		color = color.darker();
+		return health <= 0; // returns true if health is less than or equal to 0
+	}
+
+	public int destroy(Tile[][] tiles) {
 		int score = 0;
-		if (normalBlast) {
-			switch (type) {
-			case NORMAL:
-				type = TileType.EMPTY;
-				health--;
-				score = 1;
-				break;
-			case BOMB:
-				for (Tile tile : tiles[(int) (position.y / width)]) {
-					tile.type = TileType.EMPTY;
-				}
-				score = 5;
-				break;
-			case INDESTRUCTIBLE:
-				health--;
-				color = color.darker();
-				if (health <= 0) {
-					type = TileType.EMPTY;
-					score = 7;
-				}
-				break;
-			}
-		} else {
+		switch (type) {
+		case NORMAL:
+			score = 1;
+			break;
+		case BOMB:
 			for (Tile tile : tiles[(int) (position.y / width)]) {
+				value += tile.value;
 				tile.type = TileType.EMPTY;
 			}
+			score = 5;
+			break;
+		case INDESTRUCTIBLE:
+			type = TileType.EMPTY;
+			score = 10;
+			break;
 		}
-		
+		type = TileType.EMPTY;
+
 		return score;
 	}
 
